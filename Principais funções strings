@@ -1,0 +1,58 @@
+# Aula sobre strings
+
+linha = " A linha"
+#len() serve para descobir o tamanho da string, ou da seleção que voce fizer dentro da string
+'''
+print(len(linha[2]))
+'''
+
+# .capitalize() deixa a primeira letra maiuscula.
+'''
+print(linha.capitalize())
+'''
+
+#.count() Conta a quantidade de coisas que voce quer que conte [quantide de numeros, letras...]
+'''
+print((linha.count("a")))
+'''
+
+#.startswith() serve para descobrir se a palava que voce quer começa com as letras que focer quer [entrega valores boleanos {TRUE/FALSE}}
+'''
+print(linha.startswith("li"))
+'''
+
+#endswith() deferente da anterior, serve para descobrir se as palavras terminam com a letra que voce quer [entrega valores boleanos tambem]
+'''
+print(linha.endswith("ha"))
+'''
+
+#replace() troca a linha por algo da sua escolha
+'''
+print(linha.replace("linha", "coluna"))
+'''
+
+#.split() remove coisas da string que voce seleciona
+'''
+print(linha.split("a"))
+'''
+
+
+########################### ATIVIDADE ########################################
+
+#1. Escreva um programa que divide uma data no formato "dd/mm/aaaa" em dia, mes e ano.
+'''
+data = input("Digite os valores de data da seguinte forma dia/mes/ano\n")
+dia,mes,ano = data.split("/")
+print(f"dia: {dia}, mês: {mes}, ano: {ano}")
+
+'''
+
+#2. Escreva um programa que que verifique se um nome de arquivo termina com ".txt"
+
+entrada = input("Digite o nome do seu arquivo e coloque o tipo dele '.txt', '.pdf'...\n")
+termino = (entrada.endswith(".txt"))
+print(termino)
+if(termino == True):
+    print("é um arquivo de texto")
+else:
+    print("Não é um arquivo de texto")
