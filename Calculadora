@@ -1,0 +1,51 @@
+print("---------------------------------------------------------------------------")
+print("digite 3 valores, se a soma dos 3 valores forem menores que 200 e maiores que 10,\nvocê podera fazer outras funções matemáticas")
+print("---------------------------------------------------------------------------")
+a=int(input("digite o valor de X\n"))
+b= int(input("digite o valor de Y\n"))
+c= int(input("digite o valor de Z\n"))
+d=(a+b+c)
+print(d)
+
+
+if(d>=10 )and( d<= 20):
+   print("o numero é está no intervalo")
+form2=(input("qual função você quer agora? \n 1- soma \n 2- subtração \n 3- multiplicação \n 4- divisão \n 5- porcentagem \n 6- potência\n 7- equação do segundo grau\n qualquer outro valor, o programa será encerrado!\n"))
+
+
+if(form2 == "1"):
+   soma = int(input(f"digite o valor que quer somar a {d}\n"))
+   print(soma + d)
+elif(form2 == "2"):
+   sub = float(input(f"digite o valor que quer subtrair de {d}\n"))
+   print(d - sub)
+elif(form2 == "3"):
+   multi = float(input(f"digite o valor que quer multiplicar por {d}\n"))
+   print(multi*d)
+elif(form2 == "4"):
+   div = float(input(f"Digite o valor pelo qual quer dividir {d}\n"))
+   print(d/div)
+elif(form2 == "5"):
+   porc = float(input(f"digite o valor que você quer a porcentagem de {d}\n"))
+   print((porc*d)*100)
+elif(form2 == "6"):
+   pot = int(input(f"digite o numero que você quer que {d} seja elevado\n"))
+   print(d**pot)
+elif(form2 == "7"):
+
+    print("===========================================")
+
+    A = int(input("digite o valor de A\n"))
+    B = int(input("digite o valor de B\n"))
+    C = int(input("digite o valor de C\n"))
+
+    # calculando o valor de delta
+    Δ = (B * B) - (4 * A * C)
+    print(f"o valor de delta é: {Δ}")
+
+    # calculando os valores das raizes
+    X1 = (-B + Δ ** (1 / 2)) / 2 * A
+    X2 = (-B - Δ ** (1 / 2)) / 2 * A
+    print(f"os valor das reizes são \nx1: {X1}  x2: {X2}")
+else:
+     print("programa encerrado :) !!!")
