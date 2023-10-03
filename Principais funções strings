@@ -36,6 +36,16 @@ print(linha.replace("linha", "coluna"))
 print(linha.split("a"))
 '''
 
+#.upper() transforma todas as letras da string em maiúscula 
+"""
+print(linha.upper())
+"""
+
+#.lower() transforma todas as letras em minusculas
+"""
+print(linha.lower())
+"""
+
 
 ########################### ATIVIDADE ########################################
 
@@ -48,6 +58,7 @@ print(f"dia: {dia}, mês: {mes}, ano: {ano}")
 '''
 
 #2. Escreva um programa que que verifique se um nome de arquivo termina com ".txt"
+"""
 
 entrada = input("Digite o nome do seu arquivo e coloque o tipo dele '.txt', '.pdf'...\n")
 termino = (entrada.endswith(".txt"))
@@ -56,3 +67,4 @@ if(termino == True):
     print("é um arquivo de texto")
 else:
     print("Não é um arquivo de texto")
+"""
