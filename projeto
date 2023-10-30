@@ -1,0 +1,151 @@
+# Função para exibir mensagens de erro
+def exibir_erro(mensagem):
+    print("\033[91m\n" + mensagem + "\033[0m\n")
+
+#exibir menu
+def exibir_menu():
+    print("\n======================")
+    print("    MENU DE OPÇÕES    ")
+    print("======================")
+    print("[0] Para Sair")
+    print("[1] Cadastrar Produtos")
+    print("[2] Listar Produtos")
+    print("[3] Buscar Produtos")
+    print("[4] Remover Veículos") 
+
+#cadastrar
+def cadastrar(produtos):
+    voltar = False
+    while not voltar:
+        modelo_carro = input('Modelo do Veículo: ')
+        placa = input('Placa do Veículo: ')
+        ano = int(input('Insira o Ano de Fabricação do Veículo: '))
+        cor = input('Insira a Cor do Veículo: ')
+        produtos.append([placa, modelo_carro, ano, cor])
+
+        voltinha = input("Deseja cadastrar mais algum veiculo?").capitalize()
+
+        if voltinha == "Sim":
+            print("\n\n Cadastro de novo veiculo:\n")
+            continue
+        else:
+            voltar = True
+
+#Remover Veiculos
+def remover_veiculo(produtos):
+    listar(produtos)
+
+    while True:
+        escolha = input(f"\nDigite o número do veículo que você deseja remover (até {len(produtos)}) ou 'voltar' para retornar ao menu: ")
+
+        if escolha == "voltar":
+            break
+
+        if escolha.isdigit():
+            indice_escolhido = int(escolha)
+            if 1 <= indice_escolhido <= len(produtos):
+                produto_removido = produtos.pop(indice_escolhido - 1)
+                print(f"Veículo {produto_removido[1]} removido com sucesso!")
+            else:
+                exibir_erro("Opção inválida. Tente novamente!")
+        else:
+            exibir_erro("Opção inválida. Tente novamente!")
+
+# Listagem de Produtos
+def listar(produtos):
+    for i, produto in enumerate(produtos, 1):
+        placa, modelo_carro, ano, cor = produto
+        print(f'[{i}] Modelo do Veículo:{modelo_carro} de cor {cor}\n')
+
+    while True:
+        escolha = input(f"\nDigite um número entre 1 e {len(produtos)} para mais detalhes ou 'voltar' para retornar ao menu: ")
+
+        if escolha == "voltar":
+            break
+
+        if escolha.isdigit():
+            i = int(escolha)
+            if 1 <= i <= len(produtos):
+                placa, modelo_carro, ano, cor = produtos[i - 1]
+                print(f'\nVocê selecionou o veículo: {modelo_carro}')
+                print("______________________________________________________")
+                print(f"O carro {modelo_carro} de cor {cor}, possui a placa {placa}, e o ano de fabricação é {ano}")
+                print("______________________________________________________")
+            else:
+                exibir_erro("Opção inválida. Tente novamente!")
+        else:
+            exibir_erro("Opção inválida. Tente novamente!")
+
+# Busca do Produto
+def buscar(produtos):
+    filtros = {}
+    opcoes_menu = {
+        "1": ("Placa", "placa"),
+        "2": ("Modelo", "model"),
+        "3": ("Ano", "ano"),
+        "4": ("Cor", "cor")
+    }
+
+    while True:
+        print("Escolha o filtro que deseja adicionar:")
+        for opcao, (descricao, _) in opcoes_menu.items():
+            print(f"[{opcao}] {descricao}")
+        print("[5] Finalizar busca")
+
+        escolha = input("\nSelecione uma opção: ")
+
+        if escolha in opcoes_menu:
+            descricao, chave = opcoes_menu[escolha]
+            if chave == "ano":
+                valor = int(input(f"Digite o {descricao.lower()}: "))
+            else:
+                valor = input(f"Digite o {descricao.lower()}: ")
+            filtros[chave] = valor
+        elif escolha == "5":
+            break
+        else:
+            print("\033[91m\nOpção inválida. Tente novamente!\033[0m")
+
+    produtos_encontrados = [produto for produto in produtos if all(
+        not filtros.get(chave) or filtros.get(chave) == valor for chave, valor in zip(["placa", "model", "ano", "cor"], produto)
+    )]
+
+    if produtos_encontrados:
+        print("\033[93m+++++++++++++++++++++++++++++++++\033[0m")
+        print("\033[93mVeiculos encontrados: \033[0m")
+        for produto in produtos_encontrados:
+            placa, modelo_carro, ano, cor = produto
+            print(f"\033[93m\nModelo: {modelo_carro}\nPlaca: {placa}\nAno: {ano}\nCor: {cor}\n\033[0m")
+            print("\033[93m+++++++++++++++++++++++++++++++++\033[0m")
+    else:
+            exibir_erro("Opção inválida. Tente novamente!")
+
+#principal
+def main():
+    produtos = []
+    while True:
+        exibir_menu()
+
+        while True:
+            try:
+                opcao = int(input('\nInsira a opção: '))
+                break  # Se conseguirmos converter para int sem erros, saímos do loop interno
+            except ValueError:
+                exibir_erro("Por favor, insira um número válido!")
+
+        if opcao == 0:
+            print('\nSaindo...')
+            break
+        elif opcao == 1:
+            cadastrar(produtos)
+        elif opcao == 2:
+            listar(produtos)
+        elif opcao == 3:
+            buscar(produtos)
+        elif opcao == 4:   # Adicionando a nova opção
+            remover_veiculo(produtos)
+        else:
+            exibir_erro("Opção inválida. Tente novamente!")
+
+# o código começa aqui
+main()
