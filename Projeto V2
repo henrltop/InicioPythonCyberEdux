@@ -1,0 +1,229 @@
+from prettytable import PrettyTable
+import csv
+import requests
+from io import StringIO
+
+def fetch_and_load_data(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    data = StringIO(response.text)
+    reader = csv.DictReader(data)
+    return list(reader)
+
+def carregar_dados_csv(local_path):
+    dados = []
+    with open(local_path, mode='r', newline='', encoding='utf-8') as arquivo:
+        leitor = csv.DictReader(arquivo)
+        for linha in leitor:
+            dados.append(linha)
+    return dados
+
+def salvar_dados_csv(dados, local_path):
+    if dados:
+        chaves = dados[0].keys()
+        with open(local_path, mode='w', newline='', encoding='utf-8') as arquivo:
+            escritor = csv.DictWriter(arquivo, fieldnames=chaves)
+            escritor.writeheader()
+            escritor.writerows(dados)
+
+def exibir_erro(mensagem):
+    print("\033[91m\n" + mensagem + "\033[0m\n")
+
+def exibir_menu():
+    print("\n======================")
+    print("    MENU DE OPÇÕES    ")
+    print("======================")
+    print("[0] Para Sair")
+    print("[1] Cadastrar Produtos")
+    print("[2] Listar Produtos")
+    print("[3] Buscar Produtos")
+    print("[4] Remover Veículos")
+
+def exibir_tabela(produtos):
+    tabela = PrettyTable()
+    tabela.field_names = ["Placa", "Modelo", "Ano", "Cor"]
+
+    for produto in produtos:
+        # Certifique-se de que as chaves correspondem exatamente às do seu CSV
+        tabela.add_row([produto["Placa"], produto["Modelo"], produto["Ano"], produto["Cor"]])
+
+    print(tabela)
+
+def cadastrar_veiculo_csv(Dados_armazenados):
+    dados = fetch_and_load_data(Dados_armazenados)
+    continuar_cadastrando = True
+
+    while continuar_cadastrando:
+        modelo_carro = input('Modelo do Veículo: ')
+        placa = input('Placa do Veículo: ')
+
+        while True:
+            try:
+                ano = int(input('Insira o Ano de Fabricação do Veículo: '))
+                break
+            except ValueError:
+                print("Por favor, insira um ano válido.")
+
+        cor = input('Insira a Cor do Veículo: ')
+        dados.append({'Placa': placa, 'Modelo': modelo_carro, 'Ano': str(ano), 'Cor': cor})
+
+        voltinha = input("Deseja cadastrar mais algum veículo? (Sim/Não)").capitalize()
+        if voltinha != "Sim":
+            continuar_cadastrando = False
+
+    salvar_dados_csv(dados, Dados_armazenados)
+    print("Veículos cadastrados com sucesso!")
+
+def listar(produtos):
+    if not produtos:
+        exibir_erro("Nenhum veículo cadastrado.")
+        return
+    exibir_tabela(produtos)
+
+def buscar(produtos):
+    produtos_filtrados = produtos.copy()  # Começa com todos os produtos
+
+    while True:
+        print("\nOpções de busca:")
+        print("[1] Filtrar por Placa")
+        print("[2] Filtrar por Modelo")
+        print("[3] Filtrar por Ano")
+        print("[4] Filtrar por Cor")
+        print("[5] Remover todos os filtros e mostrar todos os veículos")
+        print("[0] Voltar ao menu principal")
+
+        escolha = input("\nSelecione uma opção: ")
+
+        if escolha == "0":
+            break  # Sai do loop e retorna ao menu principal
+        elif escolha == "5":
+            produtos_filtrados = produtos.copy()  # Remove os filtros
+            print("\nTodos os veículos:")
+        elif escolha in ["1", "2", "3", "4"]:
+            opcoes = {
+                "1": "Placa",
+                "2": "Modelo",
+                "3": "Ano",
+                "4": "Cor"
+            }
+            chave = opcoes[escolha]
+            valor = input(f"Digite o {chave} para filtrar: ").lower()
+
+            # Para campos numéricos como o Ano, convertemos o valor para string antes de comparar
+            if chave == "Ano":
+                produtos_filtrados = [produto for produto in produtos_filtrados if valor == str(produto[chave])]
+            else:
+                produtos_filtrados = [produto for produto in produtos_filtrados if valor in produto[chave].lower()]
+
+            if not produtos_filtrados:
+                print("Nenhum veículo encontrado com os critérios especificados.")
+                break  # Se nenhum veículo for encontrado, sai do loop de busca
+            else:
+                print(f"\nVeículos filtrados por {chave}:")
+        else:
+            print("Opção inválida. Tente novamente!")
+            continue
+
+        exibir_tabela(produtos_filtrados)  # Exibe a tabela após cada filtro aplicado ou removido
+
+
+def remover_veiculo(produtos, Dados_armazenados):
+    if not produtos:
+        exibir_erro("Nenhum veículo cadastrado.")
+        return
+
+    listar(produtos)
+
+    while True:
+        escolha = input(f"\nDigite o número do veículo que você deseja remover (1-{len(produtos)}) ou 'voltar' para retornar ao menu: ").strip()
+
+        if escolha.lower() == "voltar":
+            break
+
+        if escolha.isdigit():
+            indice_escolhido = int(escolha) - 1
+            if 0 <= indice_escolhido < len(produtos):
+                produto_removido = produtos.pop(indice_escolhido)
+                print(f"Veículo {produto_removido['Modelo']} removido com sucesso!")
+                salvar_dados_csv(produtos, Dados_armazenados)
+                break
+            else:
+                exibir_erro("Número do veículo inválido. Tente novamente!")
+        else:
+            exibir_erro("Por favor, insira um número válido ou digite 'voltar' para sair.")
+
+def atualizar_veiculo(produtos, Dados_armazenados):
+    if not produtos:
+        exibir_erro("Nenhum veículo cadastrado.")
+        return
+
+    listar(produtos)
+
+    escolha = input(f"\nDigite o número do veículo que você deseja editar (1-{len(produtos)}) ou 'voltar' para retornar ao menu: ")
+    if escolha.isdigit():
+        indice_escolhido = int(escolha) - 1
+        if 0 <= indice_escolhido < len(produtos):
+            veiculo_selecionado = produtos[indice_escolhido]
+
+            print("\nCampos disponíveis para edição:")
+            for key in veiculo_selecionado.keys():
+                print(f"- {key}")
+
+            campo = input("Digite o campo que deseja editar: ").capitalize()
+            if campo in veiculo_selecionado:
+                novo_valor = input(f"Digite o novo valor para {campo}: ")
+                veiculo_selecionado[campo] = novo_valor
+
+                salvar_dados_csv(produtos, Dados_armazenados)
+                print(f"\nVeículo atualizado com sucesso!")
+            else:
+                exibir_erro("Campo inválido. Tente novamente!")
+        else:
+            exibir_erro("Número do veículo inválido. Tente novamente!")
+    elif escolha.lower() == "voltar":
+        return
+    else:
+        exibir_erro("Opção inválida. Tente novamente!")
+
+def main():
+
+    local_csv_path = "seu_caminho_local_aqui.csv"
+    produtos = fetch_and_load_data("https://gist.githubusercontent.com/henrltop/44a5d1d0488a6f04515de71b6bf7a6bc/raw/2617687034e763d5e92bc67ed57e6a0297f37536/Data_Bank_carros")
+    salvar_dados_csv(produtos, local_csv_path)
+
+    print("\033[94m============================================")
+    print("Bem-vindo ao sistema de cadastro de veículos!")
+    print("============================================\033[0m")
+
+    while True:
+        exibir_menu()
+
+        while True:
+            try:
+                opcao = int(input('\nInsira a opção: '))
+                break
+            except ValueError:
+                exibir_erro("Por favor, insira um número válido!")
+
+        if opcao == 0:
+            print('\nSaindo...')
+            break
+        if opcao == 1:
+            cadastrar_veiculo_csv(local_csv_path)
+            produtos = carregar_dados_csv(local_csv_path)  # Reload from local file after adding a new vehicle
+        elif opcao == 2:
+            produtos = carregar_dados_csv(local_csv_path)  # Ensure the latest data is loaded
+            listar(produtos)
+        elif opcao == 3:
+            produtos = carregar_dados_csv(local_csv_path)  # Ensure the latest data is loaded
+            buscar(produtos)
+        elif opcao == 4:
+            produtos = carregar_dados_csv(local_csv_path)  # Ensure the latest data is loaded
+            remover_veiculo(produtos, local_csv_path)
+        elif opcao == 5:
+            produtos = carregar_dados_csv(local_csv_path)  # Ensure the latest data is loaded
+            atualizar_veiculo(produtos, local_csv_path)
+        else:
+            exibir_erro("Opção inválida. Tente novamente!")
+
+main()
